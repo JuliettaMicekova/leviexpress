@@ -1,11 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './style.css';
 import mapImage from './img/map.svg';
+
+export const CityOptions = ({ cities }) => {
+  return (
+    <>
+      <option value="">Vyberte</option>
+      {cities.map((city) => (
+        <option key={city.code} value={city.code}>
+          {city.name}
+        </option>
+      ))}
+    </>
+  );
+};
+
+const DatesOptions = ({ dates }) => {
+  return (
+    <>
+      <option value="">Vyberte</option>
+      {dates.map((date) => (
+        <option key={date}> {date}</option>
+      ))}
+    </>
+  );
+};
 
 export const JourneyPicker = () => {
   const [fromCity, setFromCity] = useState('');
   const [toCity, setToCity] = useState('');
   const [date, setDate] = useState('');
+  const [cities, setCities] = useState([]);
+  const [dates, setDates] = useState([]);
+
+  // const cities = [
+  //   { name: 'Praha', code: 'CZ-PRG' },
+  //   { name: 'Brno', code: 'CZ-BRQ' },
+  // ];
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -27,6 +58,18 @@ export const JourneyPicker = () => {
     setDate(e.target.value);
   };
 
+  useEffect(() => {
+    fetch('https://leviexpress-backend.herokuapp.com/api/cities')
+      .then((resp) => resp.json())
+      .then((json) => setCities(json.data));
+  }, []);
+
+  useEffect(() => {
+    fetch('https://leviexpress-backend.herokuapp.com/api/dates')
+      .then((resp) => resp.json())
+      .then((json) => setDates(json.data));
+  }, []);
+
   return (
     <>
       <div className="journey-picker container">
@@ -36,31 +79,19 @@ export const JourneyPicker = () => {
             <label>
               <div className="journey-picker__label">Odkud:</div>
               <select value={fromCity} onChange={handleFromCity}>
-                <option value="">Vyberte</option>
-                <option value="Mesto1">Město 1</option>
-                <option value="Mesto2">Město 2</option>
-                <option value="Mesto3">Město 3</option>
-                <option value="Mesto4">Město 4</option>
+                <CityOptions cities={cities} />
               </select>
             </label>
             <label>
               <div className="journey-picker__label">Kam:</div>
               <select value={toCity} onChange={handleToCity}>
-                <option value="">Vyberte</option>
-                <option value="Mesto1">Město 1</option>
-                <option value="Mesto2">Město 2</option>
-                <option value="Mesto3">Město 3</option>
-                <option value="Mesto4">Město 4</option>
+                <CityOptions cities={cities} />
               </select>
             </label>
             <label>
               <div className="journey-picker__label">Datum:</div>
               <select value={date} onChange={handleDate}>
-                <option value="">Vyberte</option>
-                <option>20.05.2021</option>
-                <option>21.05.2021</option>
-                <option>22.05.2021</option>
-                <option>23.05.2021</option>
+                <DatesOptions dates={dates} />
               </select>
             </label>
             <div className="journey-picker__controls">
